@@ -23,7 +23,8 @@ def main(argv: list[str] | None = None) -> int:
         print("  surf open <url> [--group G] Open a tab (group = object path; see note)")
         print("  surf close <id>             Close a tab")
         print("  surf focus <id>             Activate a tab")
-        print("  surf group <name.path> …    Group tabs (native groups need the extension)")
+        print("  surf groups                 List native tab groups")
+        print("  surf group <name.path> <url…>  Open URLs into a native tab group")
         print(f"{_DIM}  Object notation mirrors geno-tt: program.area.aspect.{_RESET}")
         return 0
 
@@ -45,13 +46,22 @@ def main(argv: list[str] | None = None) -> int:
     elif cmd == "open":
         p = argparse.ArgumentParser(prog="surf open", add_help=False)
         p.add_argument("url")
-        p.add_argument("--group", default=None)
+        p.add_argument("--group", default=None, help="object-notation tab group")
+        p.add_argument("--color", default="blue")
         a = p.parse_args(rest)
-        t = cdp.new_tab(a.url)
-        print(f"opened {t.get('id','?')[:8]}  {a.url}")
+        r = cdp.open_in_group(a.url, a.group, a.color)
         if a.group:
-            print(f"{_DIM}note: native tab-group '{a.group}' assignment needs the "
-                  f"geno-surf extension (phase 2); tab opened ungrouped.{_RESET}")
+            print(f"opened into group {_BOLD}{a.group}{_RESET}  {a.url}")
+        else:
+            print(f"opened {r.get('id','?')[:8]}  {a.url}")
+
+    elif cmd == "groups":
+        gs = cdp.list_groups()
+        if not gs:
+            print(f"{_DIM}no tab groups{_RESET}")
+        for g in gs:
+            print(f"  {_BOLD}{g.get('title','(untitled)')}{_RESET}  "
+                  f"{_DIM}{g.get('color','')}  id={g.get('id')}{_RESET}")
 
     elif cmd == "focus":
         if not rest:
@@ -66,11 +76,16 @@ def main(argv: list[str] | None = None) -> int:
         print(f"closed {rest[0][:8]}")
 
     elif cmd == "group":
-        raise SystemExit(
-            "Native Chrome tab groups aren't in the DevTools Protocol — they're "
-            "the chrome.tabGroups extension API. `surf group` lands in phase 2 with "
-            "the bundled extension + native-messaging bridge. Until then, model a "
-            "node as its own window/tabs via `surf open`.")
+        p = argparse.ArgumentParser(prog="surf group", add_help=False)
+        p.add_argument("title", help="object-notation group, e.g. ngrt.main.tickets")
+        p.add_argument("urls", nargs="*", help="URLs to open into the group")
+        p.add_argument("--color", default="blue")
+        a = p.parse_args(rest)
+        if not a.urls:
+            raise SystemExit("Usage: surf group <title> <url> [url…] [--color C]")
+        for u in a.urls:
+            cdp.open_in_group(u, a.title, a.color)
+        print(f"grouped {len(a.urls)} tab(s) under {_BOLD}{a.title}{_RESET} ({a.color}).")
 
     else:
         raise SystemExit(f"Unknown command '{cmd}'. Try: surf --help")

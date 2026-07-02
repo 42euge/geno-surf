@@ -1,17 +1,18 @@
 ---
 name: geno-surf-groups-group
 description: >-
-  Group tabs under an object-notation node (native Chrome tab groups — phase 2, extension).
+  Open URLs into a native Chrome tab group named by object notation (program.area.aspect).
 allowed-tools: "Bash(surf *)"
 metadata:
   author: 42euge
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # surf groups/group
 
 ```
-surf group <program.area.aspect> …
+surf group <program.area.aspect> <url> [url…] [--color blue|red|…]
+surf groups        # list existing groups
 ```
 
-Groups tabs under an object-notation node. Chrome's native Tab Groups are the `chrome.tabGroups` extension API (not in the DevTools Protocol), so this ships in phase 2 with the bundled geno-surf extension + native-messaging bridge.
+Opens each URL as a background tab inside a native Chrome tab group titled by the object path (created + colored if new). Requires the agent browser to be **Chrome for Testing** (`surf launch`) — stable Chrome 137+ blocks the bundled permissions extension. No window refocus.
