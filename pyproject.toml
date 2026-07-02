@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geno-surf"
+version = "0.1.0"
+description = "Chromium orchestration for the geno agent — the `surf` CLI (browser half of geno-tt)."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "42euge" }]
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+cdp = ["websocket-client>=1.6"]
+test = ["pytest>=8.0"]
+
+[project.scripts]
+surf = "geno_surf.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["geno_surf*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
