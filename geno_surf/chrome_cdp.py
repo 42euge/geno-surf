@@ -158,6 +158,20 @@ def list_groups(port: int = DEFAULT_PORT) -> list[dict]:
     return json.loads(_sw_eval("chrome.tabGroups.query({}).then(JSON.stringify)", port) or "[]")
 
 
+def groups_with_tabs(port: int = DEFAULT_PORT) -> list[dict]:
+    """Every native tab group with its member URLs: [{title, color, urls[]}]."""
+    js = ("(async () => {"
+          "  const gs = await chrome.tabGroups.query({});"
+          "  const out = [];"
+          "  for (const g of gs) {"
+          "    const ts = await chrome.tabs.query({groupId: g.id});"
+          "    out.push({title: g.title, color: g.color, urls: ts.map(t => t.url)});"
+          "  }"
+          "  return JSON.stringify(out);"
+          "})()")
+    return json.loads(_sw_eval(js, port) or "[]")
+
+
 def open_in_group(url: str, group_title: str | None = None,
                   color: str = "blue", port: int = DEFAULT_PORT) -> dict:
     """Open a background tab; if group_title given, add it to that native tab group

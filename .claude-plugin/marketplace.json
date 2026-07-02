@@ -6,7 +6,7 @@
       "name": "geno-surf",
       "source": "./",
       "description": "Chromium orchestration for the geno agent — the surf CLI (browser half of geno-tt)",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "license": "MIT",
       "homepage": "https://github.com/42euge/geno-surf",
       "repository": "https://github.com/42euge/geno-surf",
