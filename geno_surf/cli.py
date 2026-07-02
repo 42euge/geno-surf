@@ -66,9 +66,19 @@ def main(argv: list[str] | None = None) -> int:
 
     elif cmd == "focus":
         if not rest:
-            raise SystemExit("Usage: surf focus <id>")
-        cdp.activate_tab(rest[0])
-        print(f"focused {rest[0][:8]}")
+            raise SystemExit("Usage: surf focus <node|tabId>")
+        arg = rest[0]
+        res = cdp.focus_group(arg)  # try as an object-notation group first
+        if res != "no-group":
+            print(f"focused group {_BOLD}{arg}{_RESET} ({res})")
+        elif "." in arg:  # looks like a node path, not a tab id
+            print(f"{_DIM}no Chrome group '{arg}'{_RESET}")
+        else:
+            try:
+                cdp.activate_tab(arg)
+                print(f"focused tab {arg[:8]}")
+            except Exception:
+                print(f"{_DIM}no tab or group '{arg}'{_RESET}")
 
     elif cmd == "close":
         if not rest:

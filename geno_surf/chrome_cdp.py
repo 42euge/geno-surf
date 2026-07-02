@@ -210,5 +210,21 @@ def activate_tab(target_id: str, port: int = DEFAULT_PORT) -> None:
     _get(f"{_base(port)}/json/activate/{target_id}")
 
 
+def focus_group(title: str, port: int = DEFAULT_PORT) -> str:
+    """Raise the tab group named `title` (activate its first tab + focus window).
+    Returns 'no-group' if none matches. Explicit focus — this one raises Chrome."""
+    js = f"""(async () => {{
+      const gs = await chrome.tabGroups.query({{title: {json.dumps(title)}}});
+      if (!gs.length) return "no-group";
+      const ts = await chrome.tabs.query({{groupId: gs[0].id}});
+      if (ts.length) {{
+        await chrome.tabs.update(ts[0].id, {{active: true}});
+        await chrome.windows.update(ts[0].windowId, {{focused: true}});
+      }}
+      return "focused " + ts.length + " tab(s)";
+    }})()"""
+    return _sw_eval(js, port)
+
+
 def close_tab(target_id: str, port: int = DEFAULT_PORT) -> None:
     _get(f"{_base(port)}/json/close/{target_id}")

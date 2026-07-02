@@ -3,7 +3,7 @@
 Browser half of geno-tt: drives a dedicated Chromium over the DevTools Protocol,
 addressed by the same object-notation registry. Safari stays human."""
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 from .cli import main
 
