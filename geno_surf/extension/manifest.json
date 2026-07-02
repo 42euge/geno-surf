@@ -1,0 +1,8 @@
+{
+  "manifest_version": 3,
+  "name": "geno-surf bridge",
+  "description": "Grants tabGroups so geno-surf can drive native Chrome tab groups over CDP.",
+  "version": "0.1.0",
+  "permissions": ["tabs", "tabGroups", "alarms"],
+  "background": { "service_worker": "sw.js" }
+}
