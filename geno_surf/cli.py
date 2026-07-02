@@ -25,6 +25,7 @@ def main(argv: list[str] | None = None) -> int:
         print("  surf focus <id>             Activate a tab")
         print("  surf groups                 List native tab groups")
         print("  surf group <name.path> <url…>  Open URLs into a native tab group")
+        print("  surf reg [show|pull|push]   Sync groups \u2194 the shared object-notation registry")
         print(f"{_DIM}  Object notation mirrors geno-tt: program.area.aspect.{_RESET}")
         return 0
 
@@ -86,6 +87,47 @@ def main(argv: list[str] | None = None) -> int:
         for u in a.urls:
             cdp.open_in_group(u, a.title, a.color)
         print(f"grouped {len(a.urls)} tab(s) under {_BOLD}{a.title}{_RESET} ({a.color}).")
+
+    elif cmd == "reg":
+        from . import registry
+        sub = rest[0] if rest else "show"
+
+        if sub == "pull":
+            reg = registry.load()
+            n = 0
+            for g in cdp.groups_with_tabs():
+                if not g.get("title"):
+                    continue
+                registry.node(reg, g["title"])["chrome"] = {
+                    "group": g["title"], "color": g.get("color", "blue"),
+                    "urls": g.get("urls", [])}
+                n += 1
+            registry.save(reg)
+            print(f"pulled {n} Chrome group(s) → {registry.PATH}")
+
+        elif sub == "push":
+            reg = registry.load()
+            n = 0
+            for path, node in sorted(reg.get("nodes", {}).items()):
+                ch = node.get("chrome")
+                if ch and ch.get("urls"):
+                    for u in ch["urls"]:
+                        cdp.open_in_group(u, ch.get("group", path), ch.get("color", "blue"))
+                    n += 1
+            print(f"pushed {n} node(s) → Chrome tab groups")
+
+        else:  # show
+            reg = registry.load()
+            nodes = reg.get("nodes", {})
+            if not nodes:
+                print(f"{_DIM}registry empty ({registry.PATH}){_RESET}")
+            for path, node in sorted(nodes.items()):
+                surf = []
+                if "chrome" in node:
+                    surf.append(f"chrome:{len(node['chrome'].get('urls', []))}t/{node['chrome'].get('color','')}")
+                if "iterm" in node:
+                    surf.append(f"iterm:{node['iterm'].get('tty','?')}")
+                print(f"  {_BOLD}{path}{_RESET}  {_DIM}[{' · '.join(surf) or 'no surfaces'}]{_RESET}")
 
     else:
         raise SystemExit(f"Unknown command '{cmd}'. Try: surf --help")

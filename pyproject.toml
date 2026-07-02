@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "geno-surf"
-version = "0.2.0"
+version = "0.3.0"
 description = "Chromium orchestration for the geno agent — the `surf` CLI (browser half of geno-tt)."
 readme = "README.md"
 license = { text = "MIT" }
