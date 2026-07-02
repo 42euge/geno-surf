@@ -1,0 +1,6 @@
+geno_surf.egg-info/
+__pycache__/
+*.pyc
+.pytest_cache/
+dist/
+build/

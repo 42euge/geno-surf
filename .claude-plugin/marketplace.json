@@ -1,0 +1,16 @@
+{
+  "name": "geno-surf",
+  "owner": { "name": "42euge", "url": "https://github.com/42euge" },
+  "plugins": [
+    {
+      "name": "geno-surf",
+      "source": "./",
+      "description": "Chromium orchestration for the geno agent — the surf CLI (browser half of geno-tt)",
+      "version": "0.1.0",
+      "license": "MIT",
+      "homepage": "https://github.com/42euge/geno-surf",
+      "repository": "https://github.com/42euge/geno-surf",
+      "keywords": ["chromium", "browser", "devtools-protocol", "geno-ecosystem"]
+    }
+  ]
+}
