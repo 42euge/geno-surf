@@ -7,7 +7,7 @@ description: >-
 allowed-tools: "Bash(surf *)"
 metadata:
   author: 42euge
-  version: "0.1.0"
+  version: "0.4.0"
 ---
 
 # geno-surf — Chromium orchestration

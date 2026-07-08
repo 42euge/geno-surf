@@ -1,5 +1,5 @@
 name: geno-surf
-version: "0.3.0"
+version: "0.4.0"
 description: Chromium orchestration for the geno agent — the `surf` CLI. Drives a dedicated Chromium (DevTools Protocol) addressed by the shared object-notation registry; the browser half of geno-tt. Part of the geno-tools ecosystem.
 license: MIT
 author: 42euge
