@@ -35,7 +35,10 @@ def main(argv: list[str] | None = None) -> int:
         print(cdp.launch())
         return 0
 
-    if not cdp.is_up():
+    # reg pull is allowed when Chrome is down — it clears stale chrome keys
+    if cmd == "reg" and (not rest or rest[0] == "pull"):
+        pass  # handled below without requiring Chrome to be up
+    elif not cdp.is_up():
         raise SystemExit("Chromium isn't running with remote debugging. Run: surf launch")
 
     if cmd == "ls":
@@ -105,15 +108,31 @@ def main(argv: list[str] | None = None) -> int:
         if sub == "pull":
             reg = registry.load()
             n = 0
-            for g in cdp.groups_with_tabs():
-                if not g.get("title"):
-                    continue
-                registry.node(reg, g["title"])["chrome"] = {
-                    "group": g["title"], "color": g.get("color", "blue"),
-                    "urls": g.get("urls", [])}
-                n += 1
-            registry.save(reg)
-            print(f"pulled {n} Chrome group(s) → {registry.PATH}")
+            try:
+                groups = cdp.groups_with_tabs()
+            except Exception:
+                groups = None  # Chromium not running
+
+            if groups is None:
+                # Chrome is down — clear all chrome keys so registry stays accurate
+                cleared = 0
+                for node in reg.get("nodes", {}).values():
+                    if "chrome" in node:
+                        del node["chrome"]
+                        cleared += 1
+                if cleared:
+                    registry.save(reg)
+                print(f"Chromium isn't running — cleared {cleared} stale chrome key(s)")
+            else:
+                for g in groups:
+                    if not g.get("title"):
+                        continue
+                    registry.node(reg, g["title"])["chrome"] = {
+                        "group": g["title"], "color": g.get("color", "blue"),
+                        "urls": g.get("urls", [])}
+                    n += 1
+                registry.save(reg)
+                print(f"pulled {n} Chrome group(s) → {registry.PATH}")
 
         elif sub == "push":
             reg = registry.load()
